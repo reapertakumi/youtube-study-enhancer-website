@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTube Study Enhancer | Focus Mode for YouTube</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: linear-gradient(135deg, #000000 0%, #c92254 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Animated background */
+    .bg-animation {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
+    }
+
+    .bg-animation::before {
+      content: '';
+      position: absolute;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px);
+      background-size: 40px 40px;
+      animation: moveGrid 20s linear infinite;
+    }
+
+    @keyframes moveGrid {
+      0% {
+        transform: translate(0, 0);
+      }
+      100% {
+        transform: translate(40px, 40px);
+      }
+    }
+
+    /* Floating shapes */
+    .floating-shape {
+      position: fixed;
+      background: linear-gradient(135deg, rgba(255, 0, 0, 0.2), rgba(216, 25, 25, 0.1));
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: -1;
+      animation: float 20s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0) rotate(0deg);
+      }
+      50% {
+        transform: translateY(-30px) rotate(180deg);
+      }
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 48px 24px;
+    }
+
+    /* Header Animation */
+    .header {
+      text-align: center;
+      margin-bottom: 60px;
+      animation: fadeInDown 0.8s ease-out;
+    }
+
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .badge {
+      display: inline-block;
+      background: rgba(0,0,0,0.3);
+      padding: 6px 14px;
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #ffffff;
+      margin-bottom: 20px;
+      backdrop-filter: blur(10px);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 0.7;
+      }
+      50% {
+        opacity: 1;
+      }
+    }
+
+    h1 {
+      font-size: 56px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ff0000, #ff6b6b);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 16px;
+    }
+
+    .subtitle {
+      font-size: 20px;
+      color: #ffffff;
+      margin-bottom: 32px;
+    }
+
+    /* Store Banner Animation */
+    .banner-wrapper {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 80px;
+      animation: fadeInUp 0.8s ease-out 0.2s both;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .store-banner {
+      width: 100%;
+      max-width: 880px;
+      background: linear-gradient(135deg, #1e1e1e 0%, #121212 100%);
+      border-radius: 48px;
+      padding: 48px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .store-banner:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 35px 60px -15px rgba(0, 0, 0, 0.4);
+    }
+
+    .store-banner::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,0,0,0.1) 0%, transparent 70%);
+      animation: shimmer 8s ease-in-out infinite;
+    }
+
+    @keyframes shimmer {
+      0%, 100% {
+        transform: translate(-20%, -20%);
+      }
+      50% {
+        transform: translate(0%, 0%);
+      }
+    }
+
+    .banner-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .icon-large {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      animation: bounceIn 0.6s ease-out;
+    }
+
+    @keyframes bounceIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.3);
+      }
+      50% {
+        opacity: 0.9;
+        transform: scale(1.05);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .youtube-icon-large {
+      position: relative;
+      width: 0;
+      height: 0;
+      border-left: 32px solid #FF0000;
+      border-top: 18px solid transparent;
+      border-bottom: 18px solid transparent;
+    }
+
+    .plus-icon-large {
+      position: relative;
+      width: 48px;
+      height: 48px;
+    }
+
+    .plus-icon-large::before,
+    .plus-icon-large::after {
+      content: '';
+      position: absolute;
+      background: #FF0000;
+      border-radius: 8px;
+    }
+
+    .plus-icon-large::before {
+      width: 48px;
+      height: 6px;
+      top: 50%;
+      left: 0;
+      transform: translateY(-50%);
+    }
+
+    .plus-icon-large::after {
+      width: 6px;
+      height: 48px;
+      left: 50%;
+      top: 0;
+      transform: translateX(-50%);
+    }
+
+    .banner-title {
+      font-size: 48px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ff0000, #ff6b6b);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-align: center;
+    }
+
+    .banner-subtitle {
+      font-size: 18px;
+      color: #ffffff;
+      text-align: center;
+    }
+
+    .features {
+      display: flex;
+      gap: 24px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    .feature-tag {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 8px 20px;
+      border-radius: 100px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #ffffff;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      backdrop-filter: blur(5px);
+    }
+
+    .feature-tag:hover {
+      background: #FF0000;
+      color: white;
+      transform: translateY(-2px);
+    }
+
+    /* Feature Cards */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 32px;
+      margin: 60px 0;
+      animation: fadeInUp 0.8s ease-out 0.4s both;
+    }
+
+    .feature-card {
+      background: rgba(30, 30, 30, 0.9);
+      backdrop-filter: blur(10px);
+      padding: 32px;
+      border-radius: 28px;
+      text-align: center;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .feature-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.4);
+      border-color: rgba(255, 0, 0, 0.4);
+      background: rgba(40, 40, 45, 0.95);
+    }
+
+    .feature-icon {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 20px;
+      background: linear-gradient(135deg, #FF0000, #CC0000);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      transition: transform 0.3s ease;
+    }
+
+    .feature-card:hover .feature-icon {
+      transform: scale(1.1) rotate(5deg);
+    }
+
+    .feature-card h3 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: #ffffff;
+    }
+
+    .feature-card p {
+      color: #aaa;
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+    /* CTA Buttons */
+    .button-group {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+
+    .cta-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: linear-gradient(135deg, #FF0000, #CC0000);
+      color: white;
+      padding: 16px 32px;
+      border-radius: 100px;
+      font-weight: 600;
+      font-size: 18px;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(255, 0, 0, 0.3);
+      border: none;
+      cursor: pointer;
+      animation: fadeInUp 0.8s ease-out 0.6s both;
+    }
+
+    .cta-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(255, 0, 0, 0.5);
+    }
+
+    .cta-button.secondary {
+      background: linear-gradient(135deg, #333, #222);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .cta-button.secondary:hover {
+      background: linear-gradient(135deg, #444, #333);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+    }
+
+    .cta-button:active {
+      transform: translateY(0);
+    }
+
+    /* Download Section */
+    .download-section {
+      background: rgba(30, 30, 30, 0.9);
+      backdrop-filter: blur(10px);
+      border-radius: 48px;
+      padding: 48px;
+      text-align: center;
+      margin-top: 60px;
+      animation: fadeInUp 0.8s ease-out 0.8s both;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .download-section h2 {
+      font-size: 32px;
+      margin-bottom: 16px;
+      color: #ff0000;
+    }
+
+    .download-section p {
+      color: #aaa;
+      margin-bottom: 24px;
+    }
+
+    .version-badge {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 500;
+      color: #aaa;
+      margin-top: 20px;
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 40px 0 20px;
+      color: #888;
+      font-size: 14px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      margin-top: 60px;
+    }
+
+    .github-corner {
+      position: fixed;
+      top: 0;
+      right: 0;
+      z-index: 100;
+    }
+
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 36px;
+      }
+      
+      .banner-title {
+        font-size: 32px;
+      }
+      
+      .store-banner {
+        padding: 32px 24px;
+      }
+      
+      .container {
+        padding: 24px 16px;
+      }
+      
+      .button-group {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .cta-button {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- GitHub Corner -->
+  <a href="https://github.com/reapertakumi/YouTube-Study-Enhancer" class="github-corner" target="_blank" aria-label="View source on GitHub">
+    <svg width="80" height="80" viewBox="0 0 250 250" style="fill:#FF0000; color:#fff; position: absolute; top: 0; right: 0; border: 0;">
+      <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+      <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+      <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path>
+    </svg>
+  </a>
+  
+  <div class="bg-animation"></div>
+  
+  <!-- Floating shapes -->
+  <div class="floating-shape" style="width: 300px; height: 300px; top: -100px; left: -100px; animation-duration: 25s;"></div>
+  <div class="floating-shape" style="width: 200px; height: 200px; bottom: -50px; right: -50px; animation-duration: 20s; animation-delay: -5s;"></div>
+  <div class="floating-shape" style="width: 150px; height: 150px; top: 50%; right: 10%; animation-duration: 18s; animation-delay: -10s;"></div>
+
+  <div class="container">
+    <div class="header">
+      <div class="badge">✨ Version 0.4 Released</div>
+      <h1>YouTube Study Enhancer</h1>
+      <div class="subtitle">Focus Mode for YouTube — No Shorts, No Distractions, No 2x Speed</div>
+    </div>
+
+    <!-- Main Store Banner -->
+    <div class="banner-wrapper">
+      <div class="store-banner">
+        <div class="banner-content">
+          <div class="icon-large">
+            <div class="youtube-icon-large"></div>
+            <div class="plus-icon-large"></div>
+          </div>
+          <div class="banner-title">YouTube Study Enhancer</div>
+          <div class="banner-subtitle">Clean, Fast, Distraction-Free YouTube</div>
+          <div class="features">
+            <span class="feature-tag">🎬 Hide Shorts</span>
+            <span class="feature-tag">⚡ Block 2x Speed</span>
+            <span class="feature-tag">📺 Clean Sidebar</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Features Grid -->
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🎬</div>
+        <h3>Hide YouTube Shorts</h3>
+        <p>Completely remove Shorts from homepage, search results, and sidebar. Enjoy a clean, distraction-free feed.</p>
+      </div>
+      
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <h3>Block 2x Speed</h3>
+        <p>Prevent accidental speed changes when holding space or clicking. Watch at normal speed, always. Perfect for studying!</p>
+      </div>
+      
+      <div class="feature-card">
+        <div class="feature-icon">📺</div>
+        <h3>Hide Suggested Videos</h3>
+        <p>Remove the "Up next" sidebar while watching videos. Perfect for focus mode and uninterrupted learning.</p>
+      </div>
+      
+      <div class="feature-card">
+        <div class="feature-icon">🎨</div>
+        <h3>Modern Dark UI</h3>
+        <p>Beautiful, modern dark gray interface with smooth animations and intuitive toggle switches.</p>
+      </div>
+      
+      <div class="feature-card">
+        <div class="feature-icon">💾</div>
+        <h3>Settings Persist</h3>
+        <p>Your preferences are saved automatically. Settings sync across browser sessions.</p>
+      </div>
+      
+      <div class="feature-card">
+        <div class="feature-icon">🚀</div>
+        <h3>Lightweight & Fast</h3>
+        <p>No performance impact. Works instantly without slowing down YouTube.</p>
+      </div>
+    </div>
+
+    <!-- Download Section -->
+    <div class="download-section">
+      <h2>Ready to study without distractions?</h2>
+      <p>Download the extension and take control of your YouTube experience</p>
+      
+      <div class="button-group">
+        <a href="https://github.com/reapertakumi/YouTube-Study-Enhancer/archive/refs/heads/main.zip" class="cta-button" id="downloadZipBtn">
+          📦 Download ZIP
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 11l5 5 5-5M12 4v12"/>
+          </svg>
+        </a>
+        <a href="https://github.com/reapertakumi/YouTube-Study-Enhancer" class="cta-button secondary" id="githubBtn" target="_blank">
+          🐙 View on GitHub
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.108-.775.418-1.305.762-1.604-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+          </svg>
+        </a>
+      </div>
+      
+      <div class="version-badge">Version 0.4 • Free • Open Source</div>
+    </div>
+
+    <div class="footer">
+      <p>YouTube Study Enhancer is not affiliated with YouTube or Google.</p>
+      <p style="margin-top: 8px;">Made for students, by students — Focus on learning, not distractions</p>
+      <p style="margin-top: 8px;"><a href="https://github.com/reapertakumi/YouTube-Study-Enhancer" style="color: #ff6b6b; text-decoration: none;">GitHub Repository</a></p>
+    </div>
+  </div>
+
+  <script>
+    // Smooth animation on scroll
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, observerOptions);
+
+    document.querySelectorAll('.feature-card, .download-section').forEach(el => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(30px)';
+      el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+      observer.observe(el);
+    });
+
+    // Notification function
+    function showNotification(message) {
+      const notification = document.createElement('div');
+      notification.textContent = message;
+      notification.style.position = 'fixed';
+      notification.style.bottom = '20px';
+      notification.style.left = '50%';
+      notification.style.transform = 'translateX(-50%)';
+      notification.style.backgroundColor = '#FF0000';
+      notification.style.color = 'white';
+      notification.style.padding = '12px 24px';
+      notification.style.borderRadius = '100px';
+      notification.style.fontSize = '14px';
+      notification.style.zIndex = '9999';
+      notification.style.boxShadow = '0 4px 15px rgba(0,0,0,0.3)';
+      notification.style.fontWeight = '500';
+      notification.style.animation = 'fadeOut 3s ease forwards';
+      
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.remove();
+      }, 3000);
+    }
+
+    // Download ZIP button - direct download
+    const downloadZipBtn = document.getElementById('downloadZipBtn');
+    downloadZipBtn.addEventListener('click', (e) => {
+      // Animate button
+      downloadZipBtn.style.transform = 'scale(0.95)';
+      setTimeout(() => {
+        downloadZipBtn.style.transform = '';
+      }, 200);
+      
+      showNotification('Downloading YouTube Study Enhancer...');
+      // Let the download happen naturally via href
+    });
+
+    // GitHub button - opens repository (already has target="_blank")
+    const githubBtn = document.getElementById('githubBtn');
+    githubBtn.addEventListener('click', () => {
+      showNotification('Opening GitHub repository...');
+    });
+
+    // Hover animation for feature tags
+    document.querySelectorAll('.feature-tag').forEach(tag => {
+      tag.addEventListener('mouseenter', () => {
+        tag.style.transform = 'translateY(-2px)';
+      });
+      tag.addEventListener('mouseleave', () => {
+        tag.style.transform = '';
+      });
+    });
+
+    // Add ripple effect to both buttons
+    const buttons = document.querySelectorAll('.cta-button');
+    buttons.forEach(btn => {
+      btn.addEventListener('mousedown', (e) => {
+        const ripple = document.createElement('span');
+        ripple.style.position = 'absolute';
+        ripple.style.borderRadius = '50%';
+        ripple.style.backgroundColor = 'rgba(255, 255, 255, 0.4)';
+        ripple.style.width = '100px';
+        ripple.style.height = '100px';
+        ripple.style.transform = 'translate(-50%, -50%) scale(0)';
+        ripple.style.animation = 'ripple 0.6s linear';
+        
+        const rect = btn.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        ripple.style.left = x + 'px';
+        ripple.style.top = y + 'px';
+        
+        btn.style.position = 'relative';
+        btn.style.overflow = 'hidden';
+        btn.appendChild(ripple);
+        
+        setTimeout(() => ripple.remove(), 600);
+      });
+    });
+
+    // Add ripple animation style
+    const rippleStyle = document.createElement('style');
+    rippleStyle.textContent = `
+      @keyframes fadeOut {
+        0% {
+          opacity: 1;
+          transform: translateX(-50%) translateY(0);
+        }
+        70% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+          transform: translateX(-50%) translateY(-20px);
+          visibility: hidden;
+        }
+      }
+      
+      @keyframes ripple {
+        to {
+          transform: translate(-50%, -50%) scale(4);
+          opacity: 0;
+        }
+      }
+    `;
+    document.head.appendChild(rippleStyle);
+  </script>
+</body>
+</html>
