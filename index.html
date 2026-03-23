@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>YouTube Study Enhancer | Focus Mode for YouTube</title>
+  <title>YouTube Study Enhancer | Focus Mode + Distraction Blocker</title>
   <style>
     * {
       margin: 0;
@@ -12,438 +12,579 @@
     }
 
     body {
-      font-family: 'Inter', system-ui, -apple-system, sans-serif;
-      background: linear-gradient(135deg, #000000 0%, #c92254 100%);
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #05050a;
       min-height: 100vh;
       overflow-x: hidden;
+      color: #ffffff;
+      scroll-behavior: smooth;
     }
 
-    /* Animated background */
-    .bg-animation {
+    /* Premium Animated Background */
+    .canvas-bg {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      z-index: -1;
-      overflow: hidden;
+      z-index: -2;
+      pointer-events: none;
     }
 
-    .bg-animation::before {
-      content: '';
-      position: absolute;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px);
-      background-size: 40px 40px;
-      animation: moveGrid 20s linear infinite;
-    }
-
-    @keyframes moveGrid {
-      0% {
-        transform: translate(0, 0);
-      }
-      100% {
-        transform: translate(40px, 40px);
-      }
-    }
-
-    /* Floating shapes */
-    .floating-shape {
+    canvas {
       position: fixed;
-      background: linear-gradient(135deg, rgba(255, 0, 0, 0.2), rgba(216, 25, 25, 0.1));
-      border-radius: 50%;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -2;
+    }
+
+    .noise-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: repeating-radial-gradient(circle at 20% 30%, rgba(0,0,0,0.2) 0px, rgba(0,0,0,0.2) 1px, transparent 1px, transparent 8px);
       pointer-events: none;
       z-index: -1;
-      animation: float 20s ease-in-out infinite;
-    }
-
-    @keyframes float {
-      0%, 100% {
-        transform: translateY(0) rotate(0deg);
-      }
-      50% {
-        transform: translateY(-30px) rotate(180deg);
-      }
+      opacity: 0.3;
     }
 
     .container {
-      max-width: 1200px;
+      max-width: 1280px;
       margin: 0 auto;
       padding: 48px 24px;
+      position: relative;
+      z-index: 2;
     }
 
-    /* Header Animation */
+    /* Smooth Header */
     .header {
       text-align: center;
       margin-bottom: 60px;
-      animation: fadeInDown 0.8s ease-out;
-    }
-
-    @keyframes fadeInDown {
-      from {
-        opacity: 0;
-        transform: translateY(-30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      will-change: transform, opacity;
     }
 
     .badge {
-      display: inline-block;
-      background: rgba(0,0,0,0.3);
-      padding: 6px 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(20px);
+      padding: 10px 24px;
       border-radius: 100px;
       font-size: 13px;
       font-weight: 500;
-      color: #ffffff;
-      margin-bottom: 20px;
-      backdrop-filter: blur(10px);
-      animation: pulse 2s infinite;
+      color: #ff6b6b;
+      margin-bottom: 28px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      cursor: default;
     }
 
-    @keyframes pulse {
-      0%, 100% {
-        opacity: 0.7;
-      }
-      50% {
-        opacity: 1;
-      }
+    .badge:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255, 107, 107, 0.3);
+      box-shadow: 0 8px 20px rgba(255, 107, 107, 0.1);
     }
 
-    h1 {
-      font-size: 56px;
+    .glow-text {
+      font-size: 64px;
       font-weight: 800;
-      background: linear-gradient(135deg, #ff0000, #ff6b6b);
+      background: linear-gradient(135deg, #ffffff 0%, #ff6b6b 40%, #ff0000 70%, #ffa500 100%);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
-      margin-bottom: 16px;
+      margin-bottom: 20px;
+      letter-spacing: -0.02em;
+      filter: drop-shadow(0 0 30px rgba(255, 0, 0, 0.2));
+      animation: textGlow 3s ease-in-out infinite;
+    }
+
+    @keyframes textGlow {
+      0%, 100% {
+        filter: drop-shadow(0 0 20px rgba(255, 0, 0, 0.2));
+      }
+      50% {
+        filter: drop-shadow(0 0 40px rgba(255, 0, 0, 0.4));
+      }
     }
 
     .subtitle {
       font-size: 20px;
-      color: #ffffff;
+      color: rgba(255, 255, 255, 0.6);
       margin-bottom: 32px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.5;
     }
 
-    /* Store Banner Animation */
+    /* Premium Banner */
     .banner-wrapper {
       display: flex;
       justify-content: center;
       margin-bottom: 80px;
-      animation: fadeInUp 0.8s ease-out 0.2s both;
-    }
-
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
     }
 
     .store-banner {
       width: 100%;
-      max-width: 880px;
-      background: linear-gradient(135deg, #1e1e1e 0%, #121212 100%);
-      border-radius: 48px;
-      padding: 48px;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      max-width: 960px;
+      background: rgba(15, 15, 25, 0.5);
+      backdrop-filter: blur(40px);
+      border-radius: 64px;
+      padding: 56px 48px;
       position: relative;
       overflow: hidden;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .store-banner:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 35px 60px -15px rgba(0, 0, 0, 0.4);
+      transition: all 0.6s cubic-bezier(0.2, 0.9, 0.4, 1.2);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      will-change: transform;
     }
 
     .store-banner::before {
       content: '';
       position: absolute;
-      top: -50%;
-      right: -50%;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle, rgba(255,0,0,0.1) 0%, transparent 70%);
-      animation: shimmer 8s ease-in-out infinite;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255, 0, 0, 0.1), transparent 50%, rgba(255, 100, 100, 0.05));
+      opacity: 0;
+      transition: opacity 0.8s ease;
+      pointer-events: none;
     }
 
-    @keyframes shimmer {
-      0%, 100% {
-        transform: translate(-20%, -20%);
-      }
-      50% {
-        transform: translate(0%, 0%);
-      }
+    .store-banner:hover::before {
+      opacity: 1;
+    }
+
+    .store-banner:hover {
+      transform: translateY(-12px) scale(1.01);
+      border-color: rgba(255, 0, 0, 0.3);
+      box-shadow: 0 40px 70px -20px rgba(0, 0, 0, 0.6);
     }
 
     .banner-content {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 24px;
+      gap: 28px;
       position: relative;
-      z-index: 1;
+      z-index: 2;
     }
 
-    .icon-large {
+    .icon-group {
       display: flex;
-      gap: 20px;
+      gap: 32px;
       align-items: center;
-      animation: bounceIn 0.6s ease-out;
     }
 
-    @keyframes bounceIn {
-      0% {
-        opacity: 0;
-        transform: scale(0.3);
-      }
-      50% {
-        opacity: 0.9;
-        transform: scale(1.05);
-      }
-      100% {
-        opacity: 1;
-        transform: scale(1);
-      }
-    }
-
-    .youtube-icon-large {
+    .youtube-icon {
       position: relative;
       width: 0;
       height: 0;
-      border-left: 32px solid #FF0000;
-      border-top: 18px solid transparent;
-      border-bottom: 18px solid transparent;
+      border-left: 48px solid #FF0000;
+      border-top: 28px solid transparent;
+      border-bottom: 28px solid transparent;
+      filter: drop-shadow(0 8px 20px rgba(255, 0, 0, 0.5));
+      transition: all 0.4s ease;
     }
 
-    .plus-icon-large {
+    .store-banner:hover .youtube-icon {
+      filter: drop-shadow(0 12px 30px rgba(255, 0, 0, 0.7));
+      transform: scale(1.05);
+    }
+
+    .plus-icon {
       position: relative;
-      width: 48px;
-      height: 48px;
+      width: 64px;
+      height: 64px;
     }
 
-    .plus-icon-large::before,
-    .plus-icon-large::after {
+    .plus-icon::before,
+    .plus-icon::after {
       content: '';
       position: absolute;
-      background: #FF0000;
-      border-radius: 8px;
+      background: linear-gradient(135deg, #ff6b6b, #ff0000);
+      border-radius: 12px;
+      transition: all 0.4s ease;
     }
 
-    .plus-icon-large::before {
-      width: 48px;
+    .plus-icon::before {
+      width: 64px;
       height: 6px;
       top: 50%;
       left: 0;
       transform: translateY(-50%);
     }
 
-    .plus-icon-large::after {
+    .plus-icon::after {
       width: 6px;
-      height: 48px;
+      height: 64px;
       left: 50%;
       top: 0;
       transform: translateX(-50%);
     }
 
+    .store-banner:hover .plus-icon::before,
+    .store-banner:hover .plus-icon::after {
+      box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+    }
+
+    .block-dots {
+      display: flex;
+      gap: 12px;
+    }
+
+    .block-dot {
+      width: 18px;
+      height: 18px;
+      background: linear-gradient(135deg, #ff4444, #ff8888);
+      border-radius: 5px;
+      animation: dotPulse 1.8s ease-in-out infinite;
+    }
+
+    @keyframes dotPulse {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 0.6;
+      }
+      50% {
+        transform: scale(1.2);
+        opacity: 1;
+        box-shadow: 0 0 15px rgba(255, 68, 68, 0.8);
+      }
+    }
+
     .banner-title {
-      font-size: 48px;
+      font-size: 44px;
       font-weight: 800;
-      background: linear-gradient(135deg, #ff0000, #ff6b6b);
+      background: linear-gradient(135deg, #ffffff, #ff6b6b, #ff0000);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
       text-align: center;
     }
 
-    .banner-subtitle {
-      font-size: 18px;
-      color: #ffffff;
-      text-align: center;
-    }
-
-    .features {
+    .feature-tags {
       display: flex;
-      gap: 24px;
+      gap: 12px;
       justify-content: center;
       flex-wrap: wrap;
-      margin-top: 16px;
     }
 
     .feature-tag {
-      background: rgba(255, 255, 255, 0.1);
-      padding: 8px 20px;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 10px 24px;
       border-radius: 100px;
       font-size: 14px;
       font-weight: 500;
       color: #ffffff;
-      transition: all 0.3s ease;
+      transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
       cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, 0.05);
       backdrop-filter: blur(5px);
     }
 
     .feature-tag:hover {
-      background: #FF0000;
-      color: white;
-      transform: translateY(-2px);
+      background: linear-gradient(135deg, #ff0000, #cc0000);
+      transform: translateY(-3px) scale(1.02);
+      border-color: transparent;
+      box-shadow: 0 8px 20px rgba(255, 0, 0, 0.3);
     }
 
-    /* Feature Cards */
+    /* Smooth Feature Cards */
     .features-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 32px;
+      grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+      gap: 28px;
       margin: 60px 0;
-      animation: fadeInUp 0.8s ease-out 0.4s both;
     }
 
     .feature-card {
-      background: rgba(30, 30, 30, 0.9);
-      backdrop-filter: blur(10px);
-      padding: 32px;
-      border-radius: 28px;
-      text-align: center;
-      transition: all 0.3s ease;
+      background: rgba(12, 12, 20, 0.6);
+      backdrop-filter: blur(20px);
+      padding: 36px 28px;
+      border-radius: 32px;
+      transition: all 0.5s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      position: relative;
+      overflow: hidden;
       cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .feature-card::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #ff0000, #ff6b6b, transparent);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.6s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    }
+
+    .feature-card:hover::after {
+      transform: scaleX(1);
     }
 
     .feature-card:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.4);
-      border-color: rgba(255, 0, 0, 0.4);
-      background: rgba(40, 40, 45, 0.95);
+      transform: translateY(-10px);
+      border-color: rgba(255, 0, 0, 0.3);
+      background: rgba(20, 20, 35, 0.8);
+      box-shadow: 0 25px 40px -20px rgba(0, 0, 0, 0.5);
     }
 
     .feature-icon {
-      width: 64px;
-      height: 64px;
-      margin: 0 auto 20px;
-      background: linear-gradient(135deg, #FF0000, #CC0000);
-      border-radius: 20px;
+      width: 70px;
+      height: 70px;
+      margin-bottom: 28px;
+      background: linear-gradient(135deg, rgba(255, 0, 0, 0.15), rgba(204, 0, 0, 0.05));
+      border-radius: 24px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 32px;
-      transition: transform 0.3s ease;
+      font-size: 36px;
+      transition: all 0.4s cubic-bezier(0.34, 1.2, 0.64, 1);
     }
 
     .feature-card:hover .feature-icon {
       transform: scale(1.1) rotate(5deg);
+      background: linear-gradient(135deg, rgba(255, 0, 0, 0.3), rgba(204, 0, 0, 0.15));
     }
 
     .feature-card h3 {
-      font-size: 20px;
+      font-size: 22px;
       font-weight: 700;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
       color: #ffffff;
     }
 
     .feature-card p {
-      color: #aaa;
-      line-height: 1.5;
+      color: rgba(255, 255, 255, 0.55);
+      line-height: 1.6;
       font-size: 14px;
     }
 
-    /* CTA Buttons */
+    .new-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #ff0000, #ff6b6b);
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 30px;
+      margin-left: 10px;
+      vertical-align: middle;
+      animation: badgePulse 1.5s ease-in-out infinite;
+      letter-spacing: 0.3px;
+    }
+
+    @keyframes badgePulse {
+      0%, 100% {
+        box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.4);
+      }
+      50% {
+        box-shadow: 0 0 0 4px rgba(255, 0, 0, 0);
+      }
+    }
+
+    /* Stats Section */
+    .stats-section {
+      display: flex;
+      justify-content: center;
+      gap: 60px;
+      flex-wrap: wrap;
+      margin: 48px 0;
+      padding: 40px 32px;
+      background: rgba(10, 10, 18, 0.4);
+      backdrop-filter: blur(20px);
+      border-radius: 56px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .stat-item {
+      text-align: center;
+      position: relative;
+      transition: transform 0.3s ease;
+    }
+
+    .stat-number {
+      font-size: 44px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ff6b6b, #ff0000);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      transition: all 0.3s ease;
+    }
+
+    .stat-item:hover .stat-number {
+      transform: scale(1.05);
+      filter: drop-shadow(0 0 15px rgba(255, 0, 0, 0.3));
+    }
+
+    .stat-label {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.5);
+      margin-top: 10px;
+      letter-spacing: 0.5px;
+    }
+
+    /* Premium Download Section */
+    .download-section {
+      background: linear-gradient(135deg, rgba(15, 15, 25, 0.7), rgba(8, 8, 15, 0.8));
+      backdrop-filter: blur(30px);
+      border-radius: 56px;
+      padding: 64px 48px;
+      text-align: center;
+      margin-top: 60px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.5s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .download-section::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255, 0, 0, 0.08), transparent 70%);
+      animation: rotateGlow 20s linear infinite;
+    }
+
+    @keyframes rotateGlow {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .download-section:hover {
+      transform: translateY(-6px);
+      border-color: rgba(255, 0, 0, 0.3);
+      box-shadow: 0 30px 50px -25px rgba(0, 0, 0, 0.5);
+    }
+
+    .download-section h2 {
+      font-size: 42px;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #ffffff, #ff6b6b);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      position: relative;
+      z-index: 1;
+    }
+
+    .download-section p {
+      color: rgba(255, 255, 255, 0.6);
+      margin-bottom: 40px;
+      font-size: 18px;
+      position: relative;
+      z-index: 1;
+    }
+
     .button-group {
       display: flex;
-      gap: 20px;
+      gap: 24px;
       justify-content: center;
       flex-wrap: wrap;
-      margin-top: 20px;
+      position: relative;
+      z-index: 1;
     }
 
     .cta-button {
       display: inline-flex;
       align-items: center;
-      gap: 12px;
-      background: linear-gradient(135deg, #FF0000, #CC0000);
+      gap: 14px;
+      background: linear-gradient(135deg, #ff0000, #cc0000);
       color: white;
-      padding: 16px 32px;
+      padding: 18px 42px;
       border-radius: 100px;
       font-weight: 600;
       font-size: 18px;
       text-decoration: none;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 15px rgba(255, 0, 0, 0.3);
+      transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.2);
+      box-shadow: 0 8px 25px rgba(255, 0, 0, 0.3);
       border: none;
       cursor: pointer;
-      animation: fadeInUp 0.8s ease-out 0.6s both;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      transition: left 0.6s ease;
+    }
+
+    .cta-button:hover::before {
+      left: 100%;
     }
 
     .cta-button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(255, 0, 0, 0.5);
-    }
-
-    .cta-button.secondary {
-      background: linear-gradient(135deg, #333, #222);
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-    }
-
-    .cta-button.secondary:hover {
-      background: linear-gradient(135deg, #444, #333);
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: 0 12px 35px rgba(255, 0, 0, 0.5);
     }
 
     .cta-button:active {
-      transform: translateY(0);
+      transform: translateY(0) scale(0.98);
     }
 
-    /* Download Section */
-    .download-section {
-      background: rgba(30, 30, 30, 0.9);
-      backdrop-filter: blur(10px);
-      border-radius: 48px;
-      padding: 48px;
-      text-align: center;
-      margin-top: 60px;
-      animation: fadeInUp 0.8s ease-out 0.8s both;
-      border: 1px solid rgba(255, 255, 255, 0.08);
+    .cta-button.secondary {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.12);
     }
 
-    .download-section h2 {
-      font-size: 32px;
-      margin-bottom: 16px;
-      color: #ff0000;
-    }
-
-    .download-section p {
-      color: #aaa;
-      margin-bottom: 24px;
+    .cta-button.secondary:hover {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.06));
+      border-color: rgba(255, 0, 0, 0.4);
     }
 
     .version-badge {
       display: inline-block;
-      background: rgba(255, 255, 255, 0.1);
-      padding: 4px 12px;
-      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 8px 18px;
+      border-radius: 30px;
       font-size: 12px;
       font-weight: 500;
-      color: #aaa;
-      margin-top: 20px;
+      color: rgba(255, 255, 255, 0.5);
+      margin-top: 32px;
+      position: relative;
+      z-index: 1;
+      backdrop-filter: blur(10px);
     }
 
     /* Footer */
     .footer {
       text-align: center;
-      padding: 40px 0 20px;
-      color: #ffffff;
+      padding: 48px 0 24px;
+      color: rgba(255, 255, 255, 0.35);
       font-size: 14px;
-      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      border-top: 1px solid rgba(255, 255, 255, 0.03);
       margin-top: 60px;
+    }
+
+    .footer a {
+      color: #ff6b6b;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .footer a:hover {
+      color: #ff0000;
     }
 
     .github-corner {
@@ -451,132 +592,193 @@
       top: 0;
       right: 0;
       z-index: 100;
+      transition: opacity 0.3s ease;
+    }
+
+    .github-corner:hover {
+      opacity: 0.8;
     }
 
     @media (max-width: 768px) {
-      h1 {
-        font-size: 36px;
-      }
-      
-      .banner-title {
-        font-size: 32px;
-      }
-      
-      .store-banner {
-        padding: 32px 24px;
-      }
-      
       .container {
         padding: 24px 16px;
       }
-      
+
+      .glow-text {
+        font-size: 40px;
+      }
+
+      .banner-title {
+        font-size: 26px;
+      }
+
+      .store-banner {
+        padding: 32px 24px;
+      }
+
       .button-group {
         flex-direction: column;
         align-items: center;
       }
-      
+
       .cta-button {
         width: 100%;
         justify-content: center;
+        padding: 16px 28px;
+      }
+
+      .stats-section {
+        gap: 32px;
+        padding: 28px 20px;
+      }
+
+      .stat-number {
+        font-size: 32px;
+      }
+
+      .download-section {
+        padding: 40px 24px;
+      }
+
+      .download-section h2 {
+        font-size: 28px;
+      }
+
+      .icon-group {
+        gap: 20px;
+      }
+
+      .youtube-icon {
+        border-left: 36px solid #FF0000;
+        border-top: 21px solid transparent;
+        border-bottom: 21px solid transparent;
+      }
+
+      .plus-icon {
+        width: 48px;
+        height: 48px;
+      }
+
+      .plus-icon::before {
+        width: 48px;
+      }
+
+      .plus-icon::after {
+        height: 48px;
       }
     }
   </style>
 </head>
 <body>
-  <!-- GitHub Corner -->
-  <a href="https://github.com/reapertakumi/YouTube-Study-Enhancer" class="github-corner" target="_blank" aria-label="View source on GitHub">
-    <svg width="80" height="80" viewBox="0 0 250 250" style="fill:#FF0000; color:#fff; position: absolute; top: 0; right: 0; border: 0;">
+  <canvas class="canvas-bg" id="gradientCanvas"></canvas>
+  <div class="noise-overlay"></div>
+
+  <a href="https://github.com/reapertakumi/YouTube-Study-Enhancer" class="github-corner" target="_blank">
+    <svg width="70" height="70" viewBox="0 0 250 250" style="fill:#ff0000; color:#fff; position: absolute; top: 0; right: 0; border: 0;">
       <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
-      <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
-      <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path>
+      <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor"></path>
+      <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor"></path>
     </svg>
   </a>
-  
-  <div class="bg-animation"></div>
-  
-  <!-- Floating shapes -->
-  <div class="floating-shape" style="width: 300px; height: 300px; top: -100px; left: -100px; animation-duration: 25s;"></div>
-  <div class="floating-shape" style="width: 200px; height: 200px; bottom: -50px; right: -50px; animation-duration: 20s; animation-delay: -5s;"></div>
-  <div class="floating-shape" style="width: 150px; height: 150px; top: 50%; right: 10%; animation-duration: 18s; animation-delay: -10s;"></div>
 
   <div class="container">
-    <div class="header">
-      <div class="badge">✨ Version 0.1.1 Released</div>
-      <h1>YouTube Study Enhancer</h1>
-      <div class="subtitle">Focus Mode for YouTube — No Shorts, No Distractions, No 2x Speed</div>
+    <div class="header" data-scroll>
+      <div class="badge" data-scroll>
+        <span>✨</span> Version 0.1.5 Released
+        <span>🚀</span>
+      </div>
+      <h1 class="glow-text" data-scroll>YouTube Study Enhancer</h1>
+      <div class="subtitle" data-scroll>Focus Mode + Distraction Blocker — Study Without Interruptions</div>
     </div>
 
-    <!-- Main Store Banner -->
-    <div class="banner-wrapper">
+    <div class="banner-wrapper" data-scroll>
       <div class="store-banner">
         <div class="banner-content">
-          <div class="icon-large">
-            <div class="youtube-icon-large"></div>
-            <div class="plus-icon-large"></div>
+          <div class="icon-group">
+            <div class="youtube-icon"></div>
+            <div class="plus-icon"></div>
+            <div class="block-dots">
+              <div class="block-dot" style="animation-delay: 0s;"></div>
+              <div class="block-dot" style="animation-delay: 0.3s;"></div>
+              <div class="block-dot" style="animation-delay: 0.6s;"></div>
+            </div>
           </div>
-          <div class="banner-title">YouTube Study Enhancer</div>
-          <div class="banner-subtitle">Clean, Fast, Distraction-Free YouTube</div>
-          <div class="features">
+          <div class="banner-title">YouTube Study Enhancer + Focus Blocker</div>
+          <div class="feature-tags">
             <span class="feature-tag">🎬 Hide Shorts</span>
             <span class="feature-tag">⚡ Block 2x Speed</span>
+            <span class="feature-tag">🚫 Block Distractions</span>
             <span class="feature-tag">📺 Clean Sidebar</span>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Features Grid -->
     <div class="features-grid">
-      <div class="feature-card">
+      <div class="feature-card" data-scroll>
         <div class="feature-icon">🎬</div>
         <h3>Hide YouTube Shorts</h3>
         <p>Completely remove Shorts from homepage, search results, and sidebar. Enjoy a clean, distraction-free feed.</p>
       </div>
       
-      <div class="feature-card">
+      <div class="feature-card" data-scroll>
         <div class="feature-icon">⚡</div>
         <h3>Block 2x Speed</h3>
-        <p>Prevent accidental speed changes when holding space or clicking. Watch at normal speed, always. Perfect for studying!</p>
+        <p>Prevent accidental speed changes. Watch at normal speed, always. Perfect for focused studying.</p>
       </div>
       
-      <div class="feature-card">
+      <div class="feature-card" data-scroll>
+        <div class="feature-icon">🚫</div>
+        <h3>Block Distracting Sites <span class="new-badge">NEW</span></h3>
+        <p>Block Instagram, X (Twitter), TikTok, Reddit & Pinterest with one click. Beautiful overlay reminds you to stay focused.</p>
+      </div>
+      
+      <div class="feature-card" data-scroll>
         <div class="feature-icon">📺</div>
-        <h3>Hide Suggested Videos & Comments</h3>
-        <p>Remove the sidebar while watching videos, and disable comments. Perfect for focus mode and uninterrupted learning.</p>
+        <h3>Hide Sidebar & Comments</h3>
+        <p>Remove suggested videos sidebar and comments while watching. Perfect for uninterrupted learning.</p>
       </div>
       
-      <div class="feature-card">
+      <div class="feature-card" data-scroll>
         <div class="feature-icon">🎨</div>
         <h3>Modern Dark UI</h3>
-        <p>Beautiful, modern dark gray interface with smooth animations and intuitive toggle switches.</p>
+        <p>Beautiful dark interface with smooth toggle switches. Settings save automatically across sessions.</p>
       </div>
       
-      <div class="feature-card">
+      <div class="feature-card" data-scroll>
         <div class="feature-icon">💾</div>
-        <h3>Settings Persist</h3>
-        <p>Your preferences are saved automatically. Settings sync across browser sessions.</p>
-      </div>
-      
-      <div class="feature-card">
-        <div class="feature-icon">🚀</div>
-        <h3>Lightweight & Fast</h3>
-        <p>No performance impact. Works instantly without slowing down YouTube.</p>
+        <h3>Persistent Settings</h3>
+        <p>Your preferences are saved and synced. Enable/disable features with a single click.</p>
       </div>
     </div>
 
-    <!-- Download Section -->
-    <div class="download-section">
-      <h2>Ready to study without distractions?</h2>
-      <p>Download the extension and take control of your YouTube experience</p>
+    <div class="stats-section" data-scroll>
+      <div class="stat-item">
+        <div class="stat-number">6+</div>
+        <div class="stat-label">Blocked Features</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">5</div>
+        <div class="stat-label">Distracting Sites</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">100%</div>
+        <div class="stat-label">Free & Open Source</div>
+      </div>
+    </div>
+
+    <div class="download-section" data-scroll>
+      <h2>Ready to focus?</h2>
+      <p>Block distractions, clean up YouTube, and study with intention.</p>
       
       <div class="button-group">
         <a href="https://github.com/reapertakumi/YouTube-Study-Enhancer/releases/latest/download/YouTube.Study.Enhancer.zip" class="cta-button" id="downloadZipBtn">
-          📦 Download ZIP
+          📦 Download v0.1.5
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 11l5 5 5-5M12 4v12"/>
           </svg>
         </a>
-        <a href="https://github.com/reapertakumi/YouTube-Study-Enhancer" class="cta-button secondary" id="githubBtn" target="_blank">
+        <a href="https://github.com/reapertakumi/YouTube-Study-Enhancer" class="cta-button secondary" target="_blank">
           🐙 View on GitHub
           <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.108-.775.418-1.305.762-1.604-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
@@ -584,146 +786,187 @@
         </a>
       </div>
       
-      <div class="version-badge">Version 0.1.1 • Free • Open Source</div>
+      <div class="version-badge">Version 0.1.5 • Free • Open Source • New: Focus Blocker</div>
     </div>
 
     <div class="footer">
-      <p>YouTube Study Enhancer is not affiliated with YouTube or Google.</p>
+      <p>YouTube Study Enhancer is not affiliated with YouTube, Google, Instagram, X, TikTok, Reddit, or Pinterest.</p>
       <p style="margin-top: 8px;">Made for students, by students — Focus on learning, not distractions</p>
-      <p style="margin-top: 8px;"><a href="https://github.com/reapertakumi/YouTube-Study-Enhancer" style="color: #ff6b6b; text-decoration: none;">GitHub Repository</a></p>
+      <p style="margin-top: 12px;"><a href="https://github.com/reapertakumi/YouTube-Study-Enhancer">GitHub Repository</a> | <a href="#">Report Issue</a></p>
     </div>
   </div>
 
   <script>
-    // Smooth animation on scroll
-    const observerOptions = {
-      threshold: 0.1,
-      rootMargin: '0px 0px -50px 0px'
+    // Smooth Animated Canvas Background
+    const canvas = document.getElementById('gradientCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    
+    let time = 0;
+    let mouseX = 0.5;
+    let mouseY = 0.5;
+    
+    document.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX / window.innerWidth;
+      mouseY = e.clientY / window.innerHeight;
+    });
+    
+    function animateBackground() {
+      if (!ctx) return;
+      
+      time += 0.005;
+      
+      const w = canvas.width;
+      const h = canvas.height;
+      
+      const gradient1 = ctx.createLinearGradient(
+        w * (0.3 + Math.sin(time * 0.3) * 0.1),
+        h * (0.2 + Math.cos(time * 0.2) * 0.1),
+        w * (0.7 + Math.cos(time * 0.4) * 0.1),
+        h * (0.8 + Math.sin(time * 0.3) * 0.1)
+      );
+      gradient1.addColorStop(0, '#0a0a12');
+      gradient1.addColorStop(0.4, '#1a1a2a');
+      gradient1.addColorStop(0.7, '#0f0f1a');
+      gradient1.addColorStop(1, '#050508');
+      
+      ctx.fillStyle = gradient1;
+      ctx.fillRect(0, 0, w, h);
+      
+      // Floating orbs
+      for (let i = 0; i < 8; i++) {
+        const x = w * (0.2 + Math.sin(time * 0.2 + i) * 0.3 + mouseX * 0.1);
+        const y = h * (0.3 + Math.cos(time * 0.25 + i * 2) * 0.25 + mouseY * 0.1);
+        const radius = Math.min(w, h) * (0.08 + Math.sin(time * 0.5 + i) * 0.02);
+        
+        const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
+        gradient.addColorStop(0, `rgba(255, ${50 + i * 20}, ${50 + i * 15}, 0.12)`);
+        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, Math.PI * 2);
+        ctx.fillStyle = gradient;
+        ctx.fill();
+      }
+      
+      requestAnimationFrame(animateBackground);
+    }
+    
+    resizeCanvas();
+    animateBackground();
+    window.addEventListener('resize', resizeCanvas);
+    
+    // Smooth Scroll Observer
+    const scrollElements = document.querySelectorAll('[data-scroll]');
+    
+    const elementInView = (el, offset = 100) => {
+      const elementTop = el.getBoundingClientRect().top;
+      return elementTop <= (window.innerHeight - offset);
     };
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.style.opacity = '1';
-          entry.target.style.transform = 'translateY(0)';
+    
+    const displayScrollElement = (element) => {
+      element.style.opacity = '1';
+      element.style.transform = 'translateY(0)';
+    };
+    
+    const hideScrollElement = (element) => {
+      element.style.opacity = '0';
+      element.style.transform = 'translateY(30px)';
+    };
+    
+    const handleScrollAnimation = () => {
+      scrollElements.forEach((el) => {
+        if (elementInView(el, 80)) {
+          displayScrollElement(el);
+        } else {
+          hideScrollElement(el);
         }
       });
-    }, observerOptions);
-
-    document.querySelectorAll('.feature-card, .download-section').forEach(el => {
+    };
+    
+    scrollElements.forEach((el) => {
+      el.style.transition = 'opacity 0.8s cubic-bezier(0.2, 0.9, 0.4, 1.1), transform 0.8s cubic-bezier(0.2, 0.9, 0.4, 1.1)';
       el.style.opacity = '0';
       el.style.transform = 'translateY(30px)';
-      el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-      observer.observe(el);
     });
-
-    // Notification function
+    
+    window.addEventListener('scroll', handleScrollAnimation);
+    handleScrollAnimation();
+    
+    // Smooth notification
     function showNotification(message) {
       const notification = document.createElement('div');
       notification.textContent = message;
       notification.style.position = 'fixed';
-      notification.style.bottom = '20px';
+      notification.style.bottom = '30px';
       notification.style.left = '50%';
       notification.style.transform = 'translateX(-50%)';
-      notification.style.backgroundColor = '#FF0000';
+      notification.style.background = 'linear-gradient(135deg, #ff0000, #cc0000)';
       notification.style.color = 'white';
-      notification.style.padding = '12px 24px';
+      notification.style.padding = '14px 32px';
       notification.style.borderRadius = '100px';
       notification.style.fontSize = '14px';
-      notification.style.zIndex = '9999';
-      notification.style.boxShadow = '0 4px 15px rgba(0,0,0,0.3)';
       notification.style.fontWeight = '500';
-      notification.style.animation = 'fadeOut 3s ease forwards';
+      notification.style.zIndex = '10000';
+      notification.style.boxShadow = '0 10px 30px rgba(0,0,0,0.3)';
+      notification.style.backdropFilter = 'blur(10px)';
+      notification.style.animation = 'notificationSlide 0.5s cubic-bezier(0.2, 0.9, 0.4, 1.1), fadeOut 3s ease forwards 0.5s';
+      notification.style.pointerEvents = 'none';
+      
+      const style = document.createElement('style');
+      style.textContent = `
+        @keyframes notificationSlide {
+          from {
+            opacity: 0;
+            transform: translateX(-50%) translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+          }
+        }
+        @keyframes fadeOut {
+          to {
+            opacity: 0;
+            visibility: hidden;
+          }
+        }
+      `;
+      document.head.appendChild(style);
       
       document.body.appendChild(notification);
-      
-      setTimeout(() => {
-        notification.remove();
-      }, 3000);
+      setTimeout(() => notification.remove(), 3500);
     }
-
-    // Download ZIP button - direct download
-    const downloadZipBtn = document.getElementById('downloadZipBtn');
-    downloadZipBtn.addEventListener('click', (e) => {
-      // Animate button
-      downloadZipBtn.style.transform = 'scale(0.95)';
-      setTimeout(() => {
-        downloadZipBtn.style.transform = '';
-      }, 200);
-      
-      showNotification('Downloading YouTube Study Enhancer...');
-      // Let the download happen naturally via href
+    
+    // Download button
+    const downloadBtn = document.getElementById('downloadZipBtn');
+    downloadBtn.addEventListener('click', (e) => {
+      showNotification('Downloading YouTube Study Enhancer v0.1.5...');
     });
-
-    // GitHub button - opens repository (already has target="_blank")
-    const githubBtn = document.getElementById('githubBtn');
-    githubBtn.addEventListener('click', () => {
-      showNotification('Opening GitHub repository...');
-    });
-
-    // Hover animation for feature tags
+    
+    // Feature tag click effects
     document.querySelectorAll('.feature-tag').forEach(tag => {
-      tag.addEventListener('mouseenter', () => {
-        tag.style.transform = 'translateY(-2px)';
-      });
-      tag.addEventListener('mouseleave', () => {
-        tag.style.transform = '';
-      });
-    });
-
-    // Add ripple effect to both buttons
-    const buttons = document.querySelectorAll('.cta-button');
-    buttons.forEach(btn => {
-      btn.addEventListener('mousedown', (e) => {
-        const ripple = document.createElement('span');
-        ripple.style.position = 'absolute';
-        ripple.style.borderRadius = '50%';
-        ripple.style.backgroundColor = 'rgba(255, 255, 255, 0.4)';
-        ripple.style.width = '100px';
-        ripple.style.height = '100px';
-        ripple.style.transform = 'translate(-50%, -50%) scale(0)';
-        ripple.style.animation = 'ripple 0.6s linear';
-        
-        const rect = btn.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        ripple.style.left = x + 'px';
-        ripple.style.top = y + 'px';
-        
-        btn.style.position = 'relative';
-        btn.style.overflow = 'hidden';
-        btn.appendChild(ripple);
-        
-        setTimeout(() => ripple.remove(), 600);
+      tag.addEventListener('click', () => {
+        tag.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+          tag.style.transform = '';
+        }, 150);
       });
     });
-
-    // Add ripple animation style
-    const rippleStyle = document.createElement('style');
-    rippleStyle.textContent = `
-      @keyframes fadeOut {
-        0% {
-          opacity: 1;
-          transform: translateX(-50%) translateY(0);
-        }
-        70% {
-          opacity: 1;
-        }
-        100% {
-          opacity: 0;
-          transform: translateX(-50%) translateY(-20px);
-          visibility: hidden;
-        }
-      }
-      
-      @keyframes ripple {
-        to {
-          transform: translate(-50%, -50%) scale(4);
-          opacity: 0;
-        }
-      }
-    `;
-    document.head.appendChild(rippleStyle);
+    
+    // Smooth hover on stat items
+    document.querySelectorAll('.stat-item').forEach(item => {
+      item.addEventListener('mouseenter', () => {
+        item.style.transform = 'translateY(-5px)';
+      });
+      item.addEventListener('mouseleave', () => {
+        item.style.transform = '';
+      });
+    });
   </script>
 </body>
 </html>
