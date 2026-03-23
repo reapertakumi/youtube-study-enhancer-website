@@ -20,7 +20,6 @@
       scroll-behavior: smooth;
     }
 
-    /* Optimized Animated Background - Lightweight Canvas */
     .canvas-bg {
       position: fixed;
       top: 0;
@@ -60,7 +59,6 @@
       z-index: 2;
     }
 
-    /* Loading Spinner */
     .version-loading {
       display: inline-block;
       width: 14px;
@@ -76,7 +74,6 @@
       to { transform: rotate(360deg); }
     }
 
-    /* Header Animations */
     .header {
       text-align: center;
       margin-bottom: 60px;
@@ -149,7 +146,6 @@
       animation: fadeInUp 0.6s ease-out 0.2s both;
     }
 
-    /* Download Buttons */
     .download-buttons {
       display: flex;
       gap: 20px;
@@ -214,7 +210,6 @@
       border-color: rgba(255, 0, 0, 0.4);
     }
 
-    /* Feature Cards - Smooth hover animations */
     .features-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
@@ -238,7 +233,6 @@
     .feature-card.visible {
       opacity: 1;
       transform: translateY(0);
-      transition: opacity 0.5s cubic-bezier(0.2, 0.9, 0.4, 1.1), transform 0.5s cubic-bezier(0.2, 0.9, 0.4, 1.1), all 0.3s ease;
     }
 
     .feature-card:hover {
@@ -298,7 +292,6 @@
       }
     }
 
-    /* Stats Section */
     .stats-section {
       display: flex;
       justify-content: center;
@@ -317,7 +310,6 @@
     .stats-section.visible {
       opacity: 1;
       transform: translateY(0);
-      transition: opacity 0.5s ease, transform 0.5s ease;
     }
 
     .stat-item {
@@ -350,7 +342,6 @@
       margin-top: 8px;
     }
 
-    /* Footer */
     .footer {
       text-align: center;
       padding: 48px 0 24px;
@@ -394,13 +385,29 @@
       backdrop-filter: blur(8px);
     }
 
-    /* Floating animation for cards delay */
     .feature-card:nth-child(1) { transition-delay: 0.05s; }
     .feature-card:nth-child(2) { transition-delay: 0.1s; }
     .feature-card:nth-child(3) { transition-delay: 0.15s; }
     .feature-card:nth-child(4) { transition-delay: 0.2s; }
     .feature-card:nth-child(5) { transition-delay: 0.25s; }
     .feature-card:nth-child(6) { transition-delay: 0.3s; }
+
+    /* CORS Notice - only shows when needed */
+    .cors-notice {
+      background: rgba(255, 100, 100, 0.1);
+      border: 1px solid rgba(255, 100, 100, 0.3);
+      border-radius: 12px;
+      padding: 12px 20px;
+      margin: 20px auto;
+      max-width: 500px;
+      text-align: center;
+      font-size: 13px;
+      color: #ff9b9b;
+    }
+
+    .cors-notice a {
+      color: #ff6b6b;
+    }
 
     @media (max-width: 768px) {
       .container {
@@ -445,13 +452,6 @@
         height: 56px;
         font-size: 28px;
         margin-bottom: 20px;
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      * {
-        animation-duration: 0.01ms !important;
-        transition-duration: 0.01ms !important;
       }
     }
   </style>
@@ -557,10 +557,24 @@
   </div>
 
   <script>
-    // Lightweight Canvas Animation - Optimized for Performance
+    // Detect if running locally (file:// protocol)
+    const isLocalFile = window.location.protocol === 'file:';
+    
+    // Show CORS warning if local
+    if (isLocalFile) {
+      const container = document.querySelector('.container');
+      const notice = document.createElement('div');
+      notice.className = 'cors-notice';
+      notice.innerHTML = `
+        ⚠️ <strong>Running locally</strong> — GitHub API may be blocked by CORS.<br>
+        For live version display, <a href="https://reapertakumi.github.io/YouTube-Study-Enhancer/" target="_blank">visit the hosted site</a> or use a local server.
+      `;
+      container.insertBefore(notice, container.firstChild);
+    }
+    
+    // Lightweight Canvas Animation
     const canvas = document.getElementById('gradientCanvas');
     const ctx = canvas.getContext('2d');
-    let animationId = null;
     let time = 0;
     
     function resizeCanvas() {
@@ -570,13 +584,10 @@
     
     function animateBackground() {
       if (!ctx) return;
-      
       time += 0.003;
-      
       const w = canvas.width;
       const h = canvas.height;
       
-      // Simple gradient that shifts slowly
       const gradient1 = ctx.createLinearGradient(
         w * (0.3 + Math.sin(time) * 0.05),
         h * (0.2 + Math.cos(time * 0.7) * 0.05),
@@ -590,7 +601,6 @@
       ctx.fillStyle = gradient1;
       ctx.fillRect(0, 0, w, h);
       
-      // Fewer floating orbs for better performance
       for (let i = 0; i < 4; i++) {
         const x = w * (0.2 + Math.sin(time * 0.2 + i) * 0.2);
         const y = h * (0.3 + Math.cos(time * 0.25 + i * 2) * 0.2);
@@ -606,16 +616,14 @@
         ctx.fill();
       }
       
-      animationId = requestAnimationFrame(animateBackground);
+      requestAnimationFrame(animateBackground);
     }
     
     resizeCanvas();
     animateBackground();
-    window.addEventListener('resize', () => {
-      resizeCanvas();
-    });
+    window.addEventListener('resize', resizeCanvas);
     
-    // Intersection Observer for scroll animations - Optimized
+    // Intersection Observer for scroll animations
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -628,43 +636,50 @@
       observer.observe(el);
     });
     
-    // Fetch version with cache
+    // Fetch latest version from GitHub with fallback
     async function fetchLatestVersion() {
       const versionTextElement = document.getElementById('versionText');
       const versionLoader = document.getElementById('versionLoader');
       const footerVersionBadge = document.getElementById('footerVersionBadge');
+      const downloadBtn = document.getElementById('downloadZipBtn');
       
-      const cached = localStorage.getItem('yse_version');
-      const cachedTime = localStorage.getItem('yse_version_time');
-      const now = Date.now();
-      
-      if (cached && cachedTime && (now - parseInt(cachedTime)) < 3600000) {
-        versionTextElement.innerHTML = `Version ${cached} Released`;
-        footerVersionBadge.innerHTML = `Version ${cached} • Free • Open Source • New: Focus Blocker`;
-        versionLoader.style.display = 'none';
-        return;
-      }
+      // Hardcoded latest version (update this when you release a new version)
+      const MANUAL_VERSION = '0.1.7';
       
       try {
-        const response = await fetch('https://api.github.com/repos/reapertakumi/YouTube-Study-Enhancer/releases/latest');
-        if (!response.ok) throw new Error();
-        const data = await response.json();
-        const latestVersion = (data.tag_name || data.name || '0.1.5').replace('v', '');
+        // Try GitHub API - note: CORS will fail on file:// protocol
+        const response = await fetch('https://api.github.com/repos/reapertakumi/YouTube-Study-Enhancer/releases/latest', {
+          method: 'GET',
+          headers: { 
+            'Accept': 'application/vnd.github.v3+json'
+          }
+        });
         
-        localStorage.setItem('yse_version', latestVersion);
-        localStorage.setItem('yse_version_time', now.toString());
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        
+        const data = await response.json();
+        let latestVersion = data.tag_name || MANUAL_VERSION;
+        latestVersion = latestVersion.replace(/^v/, '');
+        
+        console.log(`✅ GitHub API returned: ${latestVersion}`);
         
         versionTextElement.innerHTML = `Version ${latestVersion} Released`;
         footerVersionBadge.innerHTML = `Version ${latestVersion} • Free • Open Source • New: Focus Blocker`;
         
-        const downloadBtn = document.getElementById('downloadZipBtn');
-        if (data.assets?.length) {
-          const zipAsset = data.assets.find(asset => asset.name.includes('.zip'));
-          if (zipAsset) downloadBtn.href = zipAsset.browser_download_url;
+        // Update download link
+        if (data.assets && data.assets.length > 0) {
+          const zipAsset = data.assets.find(asset => asset.name && asset.name.includes('.zip'));
+          if (zipAsset && zipAsset.browser_download_url) {
+            downloadBtn.href = zipAsset.browser_download_url;
+          }
         }
+        
       } catch (error) {
-        versionTextElement.innerHTML = 'Version 0.1.5 Released';
-        footerVersionBadge.innerHTML = 'Version 0.1.5 • Free • Open Source • New: Focus Blocker';
+        console.log('⚠️ Using fallback version due to:', error.message);
+        // Use manual version as fallback (works locally)
+        versionTextElement.innerHTML = `Version ${MANUAL_VERSION} Released`;
+        footerVersionBadge.innerHTML = `Version ${MANUAL_VERSION} • Free • Open Source • New: Focus Blocker`;
+        downloadBtn.href = `https://github.com/reapertakumi/YouTube-Study-Enhancer/releases/download/v${MANUAL_VERSION}/YouTube.Study.Enhancer.zip`;
       } finally {
         versionLoader.style.display = 'none';
       }
